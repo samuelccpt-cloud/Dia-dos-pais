@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feliz Dia dos Pais 💻</title>
+<style>
+  :root{
+    --bg:#0d1117;
+    --panel:#161b22;
+    --border:#30363d;
+    --text:#e6edf3;
+    --muted:#8b949e;
+    --accent:#d97757;
+    --accent2:#58a6ff;
+    --green:#3fb950;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;padding:0;height:100%;
+    background:var(--bg);
+    color:var(--text);
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Courier New",monospace;
+  }
+  .wrap{
+    max-width:760px;
+    margin:0 auto;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    padding:24px 16px 90px;
+  }
+  .titlebar{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:10px 14px;
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:10px 10px 0 0;
+  }
+  .dot{width:11px;height:11px;border-radius:50%;}
+  .dot.red{background:#ff5f56;}
+  .dot.yellow{background:#ffbd2e;}
+  .dot.green{background:#27c93f;}
+  .titlebar span.name{
+    margin-left:8px;
+    color:var(--muted);
+    font-size:13px;
+  }
+  .terminal{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-top:none;
+    border-radius:0 0 10px 10px;
+    padding:20px;
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+    min-height:420px;
+  }
+  .msg{
+    display:flex;
+    gap:10px;
+    align-items:flex-start;
+    animation:fadeIn .35s ease;
+  }
+  @keyframes fadeIn{
+    from{opacity:0;transform:translateY(6px);}
+    to{opacity:1;transform:translateY(0);}
+  }
+  .avatar{
+    flex:0 0 auto;
+    width:26px;height:26px;
+    border-radius:6px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:14px;
+  }
+  .avatar.user{background:#21262d;border:1px solid var(--border);}
+  .avatar.bot{background:var(--accent);color:#1a1a1a;}
+  .bubble{
+    flex:1;
+    line-height:1.55;
+    font-size:14.5px;
+    white-space:pre-wrap;
+    word-wrap:break-word;
+  }
+  .bubble .who{
+    color:var(--muted);
+    font-size:12px;
+    margin-bottom:4px;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+  }
+  .cursor{
+    display:inline-block;
+    width:7px;height:15px;
+    background:var(--accent);
+    margin-left:2px;
+    vertical-align:middle;
+    animation:blink 1s step-start infinite;
+  }
+  @keyframes blink{50%{opacity:0;}}
+  .tool-card{
+    border:1px solid var(--border);
+    background:#0d1117;
+    border-radius:8px;
+    padding:10px 12px;
+    font-size:13px;
+    color:var(--muted);
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .spinner{
+    width:13px;height:13px;
+    border:2px solid #30363d;
+    border-top-color:var(--accent2);
+    border-radius:50%;
+    animation:spin .7s linear infinite;
+    flex:0 0 auto;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .tool-card.done .spinner{display:none;}
+  .tool-card.done::before{
+    content:"✓";
+    color:var(--green);
+    font-weight:bold;
+  }
+  .heart{color:var(--accent);}
+  .input-row{
+    position:fixed;
+    left:0;right:0;bottom:0;
+    background:linear-gradient(0deg,var(--bg) 60%,transparent);
+    padding:18px 16px 22px;
+    display:flex;
+    justify-content:center;
+  }
+  .input-box{
+    width:100%;
+    max-width:760px;
+    display:flex;
+    gap:8px;
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:8px 8px 8px 14px;
+  }
+  .input-box input{
+    flex:1;
+    background:transparent;
+    border:none;
+    outline:none;
+    color:var(--text);
+    font-family:inherit;
+    font-size:14.5px;
+  }
+  .input-box input::placeholder{color:var(--muted);}
+  .input-box button{
+    background:var(--accent);
+    color:#1a1a1a;
+    border:none;
+    border-radius:7px;
+    padding:8px 16px;
+    font-weight:600;
+    font-family:inherit;
+    cursor:pointer;
+    font-size:13.5px;
+  }
+  .input-box button:disabled{
+    opacity:.5;
+    cursor:not-allowed;
+  }
+  .hint{
+    text-align:center;
+    color:var(--muted);
+    font-size:11.5px;
+    margin-top:8px;
+  }
+  .badge{
+    display:inline-block;
+    background:#1f2937;
+    border:1px solid var(--border);
+    color:var(--accent2);
+    padding:1px 6px;
+    border-radius:4px;
+    font-size:12px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="titlebar">
+    <div class="dot red"></div>
+    <div class="dot yellow"></div>
+    <div class="dot green"></div>
+    <span class="name">pai-programador — bash — 80x24</span>
+  </div>
+  <div class="terminal" id="terminal">
+    <div class="msg">
+      <div class="avatar bot">💻</div>
+      <div class="bubble">
+        <div class="who">agente-fap</div>
+        <span id="intro"></span><span class="cursor" id="introCursor"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="input-row">
+  <div>
+    <div class="input-box">
+      <input id="userInput" type="text" placeholder="Digite aqui... (ex: dia dos pais)" autocomplete="off">
+      <button id="sendBtn">Enviar</button>
+    </div>
+    <div class="hint">feito com <span class="heart">♥</span> por um filho que também é dev</div>
+  </div>
+</div>
+
+<script>
+const terminal = document.getElementById('terminal');
+const input = document.getElementById('userInput');
+const sendBtn = document.getElementById('sendBtn');
+
+const introText = "Olá! Este terminal foi feito especialmente pra hoje.\nDigite alguma coisa relacionada ao Dia dos Pais e aperte Enviar.";
+let introI = 0;
+function typeIntro(){
+  const el = document.getElementById('intro');
+  if(introI <= introText.length){
+    el.textContent = introText.slice(0, introI);
+    introI++;
+    setTimeout(typeIntro, 18);
+  } else {
+    document.getElementById('introCursor').remove();
+  }
+}
+typeIntro();
+
+const responses = [
+  "Rodando diagnóstico de paternidade...\n\nResultado: 100% de disponibilidade, 0 bugs no amor, uptime desde sempre. Feliz Dia dos Pais! 🎉",
+  "Compilando 365 dias de paciência, carinho e conselhos...\n\nBuild concluído com sucesso ✅ — nenhum erro encontrado, só um pai incrível. Te amo, feliz Dia dos Pais!",
+  "git log --author=\"pai\" --since=\"sempre\"\n\ncommit: ensinou a andar de bicicleta\ncommit: aturou minhas perguntas de criança\ncommit: sempre esteve presente\n\nHistórico impecável. Feliz Dia dos Pais! 💙",
+  "Buscando no banco de dados... encontrado 1 registro:\n\nnome: melhor pai do mundo\nstatus: insubstituível\ntags: [herói, exemplo, programador de vida]\n\nFeliz Dia dos Pais! 🖥️❤️",
+  "Deploy em produção realizado com sucesso.\n\nversão: eterna\nautor: você\nmensagem do commit: \"obrigado por tudo, feliz Dia dos Pais!\""
+];
+
+function addUserMsg(text){
+  const div = document.createElement('div');
+  div.className = 'msg';
+  div.innerHTML = `
+    <div class="avatar user">🙂</div>
+    <div class="bubble"><div class="who">você</div>${escapeHtml(text)}</div>
+  `;
+  terminal.appendChild(div);
+  scrollDown();
+}
+
+function escapeHtml(str){
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+function addToolCard(){
+  const div = document.createElement('div');
+  div.className = 'msg';
+  div.innerHTML = `
+    <div class="avatar bot">💻</div>
+    <div class="bubble">
+      <div class="who">agente-fap</div>
+      <div class="tool-card" id="toolCard">
+        <div class="spinner"></div>
+        <span id="toolLabel">executando...</span>
+      </div>
+    </div>
+  `;
+  terminal.appendChild(div);
+  scrollDown();
+  return div;
+}
+
+function scrollDown(){
+  window.scrollTo({top: document.body.scrollHeight, behavior:'smooth'});
+}
+
+function addBotResponse(text){
+  const div = document.createElement('div');
+  div.className = 'msg';
+  div.innerHTML = `
+    <div class="avatar bot">💻</div>
+    <div class="bubble"><div class="who">agente-fap</div><span class="botText"></span><span class="cursor"></span></div>
+  `;
+  terminal.appendChild(div);
+  scrollDown();
+  const el = div.querySelector('.botText');
+  const cursor = div.querySelector('.cursor');
+  let i = 0;
+  (function type(){
+    if(i <= text.length){
+      el.textContent = text.slice(0, i);
+      i++;
+      scrollDown();
+      setTimeout(type, 16);
+    } else {
+      cursor.remove();
+    }
+  })();
+}
+
+function handleSend(){
+  const text = input.value.trim();
+  if(!text) return;
+  addUserMsg(text);
+  input.value = '';
+  sendBtn.disabled = true;
+  input.disabled = true;
+
+  const cardWrap = addToolCard();
+  const card = cardWrap.querySelector('#toolCard');
+  const label = cardWrap.querySelector('#toolLabel');
+  const steps = ["executando...", "buscando memórias de infância...", "gerando resposta com carinho..."];
+  let s = 0;
+  const stepInterval = setInterval(() => {
+    s++;
+    if(s < steps.length){
+      label.textContent = steps[s];
+    }
+  }, 550);
+
+  setTimeout(() => {
+    clearInterval(stepInterval);
+    card.classList.add('done');
+    label.textContent = "concluído";
+    const response = responses[Math.floor(Math.random() * responses.length)];
+    setTimeout(() => {
+      addBotResponse(response);
+      sendBtn.disabled = false;
+      input.disabled = false;
+      input.focus();
+    }, 300);
+  }, 1900);
+}
+
+sendBtn.addEventListener('click', handleSend);
+input.addEventListener('keydown', (e) => {
+  if(e.key === 'Enter') handleSend();
+});
+</script>
+</body>
+</html>
