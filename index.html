@@ -3,96 +3,189 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Feliz Dia dos Pais 💻</title>
+<title>Feliz Dia dos Pais</title>
 <style>
   :root{
-    --bg:#0d1117;
-    --panel:#161b22;
-    --border:#30363d;
-    --text:#e6edf3;
-    --muted:#8b949e;
+    --bg:#0f1115;
+    --panel:#181a20;
+    --sidebar:#141519;
+    --border:#2a2d34;
+    --text:#e8e8e6;
+    --muted:#8b8d94;
     --accent:#d97757;
-    --accent2:#58a6ff;
+    --accent2:#4f9eff;
     --green:#3fb950;
+    --pill:#2a2d34;
   }
   *{box-sizing:border-box;}
   html,body{
     margin:0;padding:0;height:100%;
     background:var(--bg);
     color:var(--text);
-    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Courier New",monospace;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    overflow:hidden;
   }
-  .wrap{
-    max-width:760px;
-    margin:0 auto;
-    min-height:100vh;
+  .app{
+    display:flex;
+    height:100vh;
+    width:100vw;
+  }
+
+  /* ---- sidebar ---- */
+  .sidebar{
+    width:260px;
+    flex:0 0 auto;
+    background:var(--sidebar);
+    border-right:1px solid var(--border);
     display:flex;
     flex-direction:column;
-    padding:24px 16px 90px;
+    padding:14px 10px;
   }
-  .titlebar{
+  .sidebar .row{
     display:flex;
     align-items:center;
     gap:10px;
-    padding:10px 14px;
-    background:var(--panel);
-    border:1px solid var(--border);
-    border-radius:10px 10px 0 0;
-  }
-  .dot{width:11px;height:11px;border-radius:50%;}
-  .dot.red{background:#ff5f56;}
-  .dot.yellow{background:#ffbd2e;}
-  .dot.green{background:#27c93f;}
-  .titlebar span.name{
-    margin-left:8px;
+    padding:8px 10px;
+    border-radius:7px;
     color:var(--muted);
-    font-size:13px;
+    font-size:13.5px;
+    cursor:default;
   }
-  .terminal{
-    background:var(--panel);
-    border:1px solid var(--border);
-    border-top:none;
-    border-radius:0 0 10px 10px;
-    padding:20px;
+  .sidebar .row.active{
+    background:#20232a;
+    color:var(--text);
+  }
+  .sidebar .icon{
+    width:16px;text-align:center;font-size:14px;
+  }
+  .sidebar .section-title{
+    color:#5c5f66;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    padding:14px 10px 6px;
+  }
+  .sidebar .divider{
+    height:1px;background:var(--border);margin:10px 4px;
+  }
+  .sidebar .thread{
+    display:flex;align-items:center;gap:8px;
+    padding:7px 10px;border-radius:7px;
+    font-size:13px;color:#c9cacd;
+  }
+  .sidebar .thread .dot-status{
+    width:6px;height:6px;border-radius:50%;background:var(--accent);flex:0 0 auto;
+  }
+  .sidebar .thread.selected{background:#20232a;color:#fff;}
+  .sidebar-bottom{
+    margin-top:auto;
+    display:flex;align-items:center;gap:8px;
+    padding:10px;
+    font-size:13px;color:var(--muted);
+    border-top:1px solid var(--border);
+  }
+  .sidebar-bottom .avatar-mini{
+    width:22px;height:22px;border-radius:50%;
+    background:var(--accent);
+    display:flex;align-items:center;justify-content:center;
+    font-size:11px;color:#1a1a1a;font-weight:700;
+  }
+
+  /* ---- main ---- */
+  .main{
     flex:1;
     display:flex;
     flex-direction:column;
-    gap:16px;
-    min-height:420px;
+    min-width:0;
   }
-  .msg{
+  .topbar{
     display:flex;
+    align-items:center;
     gap:10px;
-    align-items:flex-start;
+    padding:12px 20px;
+    border-bottom:1px solid var(--border);
+    font-size:13px;
+    color:var(--muted);
+  }
+  .topbar .file-icon{font-size:14px;}
+  .topbar .title{color:var(--text);font-weight:500;}
+  .topbar .path-badge{
+    background:#20232a;border:1px solid var(--border);
+    color:var(--muted);
+    padding:1px 7px;border-radius:5px;font-size:11.5px;
+  }
+
+  .chat{
+    flex:1;
+    overflow-y:auto;
+    padding:28px 0 20px;
+  }
+  .chat-inner{
+    max-width:780px;
+    margin:0 auto;
+    padding:0 24px;
+    display:flex;
+    flex-direction:column;
+    gap:22px;
+  }
+
+  .msg-assistant{
+    animation:fadeIn .35s ease;
+    font-size:14.5px;
+    line-height:1.65;
+    color:var(--text);
+  }
+  .msg-assistant p{margin:0 0 10px;white-space:pre-wrap;}
+  .msg-assistant p:last-child{margin-bottom:0;}
+
+  .msg-user-row{
+    display:flex;
+    justify-content:flex-end;
     animation:fadeIn .35s ease;
   }
+  .msg-user{
+    background:var(--pill);
+    color:var(--text);
+    padding:9px 15px;
+    border-radius:14px;
+    font-size:14.5px;
+    max-width:70%;
+    white-space:pre-wrap;
+    word-wrap:break-word;
+  }
+
   @keyframes fadeIn{
     from{opacity:0;transform:translateY(6px);}
     to{opacity:1;transform:translateY(0);}
   }
-  .avatar{
-    flex:0 0 auto;
-    width:26px;height:26px;
-    border-radius:6px;
-    display:flex;align-items:center;justify-content:center;
-    font-size:14px;
-  }
-  .avatar.user{background:#21262d;border:1px solid var(--border);}
-  .avatar.bot{background:var(--accent);color:#1a1a1a;}
-  .bubble{
-    flex:1;
-    line-height:1.55;
-    font-size:14.5px;
-    white-space:pre-wrap;
-    word-wrap:break-word;
-  }
-  .bubble .who{
+
+  .tool-block{
+    border:1px solid var(--border);
+    background:#14161a;
+    border-radius:9px;
+    padding:10px 14px;
+    margin:10px 0;
+    font-size:13px;
     color:var(--muted);
-    font-size:12px;
-    margin-bottom:4px;
-    text-transform:uppercase;
-    letter-spacing:.04em;
   }
+  .tool-block .tool-head{
+    display:flex;align-items:center;gap:8px;cursor:default;
+  }
+  .tool-block .caret{color:#5c5f66;font-size:11px;transition:transform .2s;}
+  .spinner{
+    width:12px;height:12px;
+    border:2px solid #30363d;
+    border-top-color:var(--accent2);
+    border-radius:50%;
+    animation:spin .7s linear infinite;
+    flex:0 0 auto;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .tool-block.done .spinner{display:none;}
+  .tool-block.done .tool-head::before{
+    content:"✓";color:var(--green);font-weight:bold;font-size:12px;
+  }
+
   .cursor{
     display:inline-block;
     width:7px;height:15px;
@@ -102,135 +195,143 @@
     animation:blink 1s step-start infinite;
   }
   @keyframes blink{50%{opacity:0;}}
-  .tool-card{
-    border:1px solid var(--border);
-    background:#0d1117;
-    border-radius:8px;
-    padding:10px 12px;
-    font-size:13px;
-    color:var(--muted);
-    display:flex;
-    align-items:center;
-    gap:8px;
-  }
-  .spinner{
-    width:13px;height:13px;
-    border:2px solid #30363d;
-    border-top-color:var(--accent2);
-    border-radius:50%;
-    animation:spin .7s linear infinite;
-    flex:0 0 auto;
-  }
-  @keyframes spin{to{transform:rotate(360deg);}}
-  .tool-card.done .spinner{display:none;}
-  .tool-card.done::before{
-    content:"✓";
-    color:var(--green);
-    font-weight:bold;
-  }
+
   .heart{color:var(--accent);}
-  .input-row{
-    position:fixed;
-    left:0;right:0;bottom:0;
-    background:linear-gradient(0deg,var(--bg) 60%,transparent);
-    padding:18px 16px 22px;
-    display:flex;
-    justify-content:center;
+
+  /* ---- input bar ---- */
+  .input-area{
+    padding:14px 24px 20px;
+    border-top:1px solid var(--border);
+    background:var(--bg);
   }
-  .input-box{
-    width:100%;
-    max-width:760px;
-    display:flex;
-    gap:8px;
+  .input-shell{
+    max-width:780px;
+    margin:0 auto;
     background:var(--panel);
     border:1px solid var(--border);
-    border-radius:10px;
-    padding:8px 8px 8px 14px;
+    border-radius:14px;
+    padding:10px 12px;
   }
-  .input-box input{
-    flex:1;
+  .input-shell textarea{
+    width:100%;
     background:transparent;
     border:none;
     outline:none;
+    resize:none;
     color:var(--text);
     font-family:inherit;
     font-size:14.5px;
+    line-height:1.5;
+    max-height:120px;
   }
-  .input-box input::placeholder{color:var(--muted);}
-  .input-box button{
-    background:var(--accent);
-    color:#1a1a1a;
+  .input-shell textarea::placeholder{color:var(--muted);}
+  .input-toolbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-top:6px;
+  }
+  .model-pill{
+    display:flex;align-items:center;gap:6px;
+    background:#3a2f1f;
+    color:#e8b878;
     border:none;
+    padding:5px 11px;
     border-radius:7px;
-    padding:8px 16px;
+    font-size:12.5px;
     font-weight:600;
-    font-family:inherit;
+  }
+  .toolbar-right{
+    display:flex;align-items:center;gap:10px;
+    color:var(--muted);
+    font-size:12px;
+  }
+  .send-btn{
+    background:var(--accent);
+    border:none;
+    color:#1a1a1a;
+    width:28px;height:28px;
+    border-radius:8px;
+    display:flex;align-items:center;justify-content:center;
     cursor:pointer;
-    font-size:13.5px;
+    font-size:14px;
   }
-  .input-box button:disabled{
-    opacity:.5;
-    cursor:not-allowed;
-  }
+  .send-btn:disabled{opacity:.4;cursor:not-allowed;}
   .hint{
     text-align:center;
-    color:var(--muted);
-    font-size:11.5px;
-    margin-top:8px;
+    color:#5c5f66;
+    font-size:11px;
+    margin-top:9px;
   }
-  .badge{
-    display:inline-block;
-    background:#1f2937;
-    border:1px solid var(--border);
-    color:var(--accent2);
-    padding:1px 6px;
-    border-radius:4px;
-    font-size:12px;
+
+  @media (max-width:720px){
+    .sidebar{display:none;}
   }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="titlebar">
-    <div class="dot red"></div>
-    <div class="dot yellow"></div>
-    <div class="dot green"></div>
-    <span class="name">pai-programador — bash — 80x24</span>
+<div class="app">
+
+  <div class="sidebar">
+    <div class="row active"><span class="icon">🏠</span> Início</div>
+    <div class="row"><span class="icon">💬</span> Code</div>
+    <div class="section-title">cronometro-natacao</div>
+    <div class="thread selected"><span class="dot-status"></span> Feliz Dia dos Pais</div>
+    <div class="thread"><span class="dot-status" style="background:#5c5f66"></span> Cronômetro natação</div>
+    <div class="thread"><span class="dot-status" style="background:#5c5f66"></span> Site de portfólio</div>
+    <div class="divider"></div>
+    <div class="sidebar-bottom">
+      <div class="avatar-mini">P</div>
+      <span>Papai · Herói</span>
+    </div>
   </div>
-  <div class="terminal" id="terminal">
-    <div class="msg">
-      <div class="avatar bot">💻</div>
-      <div class="bubble">
-        <div class="who">agente-fap</div>
-        <span id="intro"></span><span class="cursor" id="introCursor"></span>
+
+  <div class="main">
+    <div class="topbar">
+      <span class="file-icon">💻</span>
+      <span class="title">Feliz Dia dos Pais</span>
+      <span class="path-badge">para-o-melhor-pai</span>
+    </div>
+
+    <div class="chat" id="chat">
+      <div class="chat-inner" id="chatInner">
+        <div class="msg-assistant">
+          <p><span id="intro"></span><span class="cursor" id="introCursor"></span></p>
+        </div>
       </div>
     </div>
-  </div>
-</div>
 
-<div class="input-row">
-  <div>
-    <div class="input-box">
-      <input id="userInput" type="text" placeholder="Digite aqui... (ex: dia dos pais)" autocomplete="off">
-      <button id="sendBtn">Enviar</button>
+    <div class="input-area">
+      <div class="input-shell">
+        <textarea id="userInput" rows="1" placeholder="Escreva algo pra hoje... (ex: dia dos pais)"></textarea>
+        <div class="input-toolbar">
+          <div class="model-pill">✨ Automático</div>
+          <div class="toolbar-right">
+            <span>Sonnet 5</span>
+            <button class="send-btn" id="sendBtn">➤</button>
+          </div>
+        </div>
+      </div>
+      <div class="hint">feito com <span class="heart">♥</span> por um filho que também é dev</div>
     </div>
-    <div class="hint">feito com <span class="heart">♥</span> por um filho que também é dev</div>
   </div>
+
 </div>
 
 <script>
-const terminal = document.getElementById('terminal');
+const chat = document.getElementById('chat');
+const chatInner = document.getElementById('chatInner');
 const input = document.getElementById('userInput');
 const sendBtn = document.getElementById('sendBtn');
 
-const introText = "Olá! Este terminal foi feito especialmente pra hoje.\nDigite alguma coisa relacionada ao Dia dos Pais e aperte Enviar.";
+const introText = "Olá! Essa página foi feita especialmente pra hoje.\n\nEscreva alguma coisa sobre o Dia dos Pais aí embaixo e manda ver.";
 let introI = 0;
 function typeIntro(){
   const el = document.getElementById('intro');
   if(introI <= introText.length){
     el.textContent = introText.slice(0, introI);
     introI++;
-    setTimeout(typeIntro, 18);
+    setTimeout(typeIntro, 16);
   } else {
     document.getElementById('introCursor').remove();
   }
@@ -238,23 +339,24 @@ function typeIntro(){
 typeIntro();
 
 const responses = [
-  "Rodando diagnóstico de paternidade...\n\nResultado: 100% de disponibilidade, 0 bugs no amor, uptime desde sempre. Feliz Dia dos Pais! 🎉",
-  "Compilando 365 dias de paciência, carinho e conselhos...\n\nBuild concluído com sucesso ✅ — nenhum erro encontrado, só um pai incrível. Te amo, feliz Dia dos Pais!",
-  "git log --author=\"pai\" --since=\"sempre\"\n\ncommit: ensinou a andar de bicicleta\ncommit: aturou minhas perguntas de criança\ncommit: sempre esteve presente\n\nHistórico impecável. Feliz Dia dos Pais! 💙",
-  "Buscando no banco de dados... encontrado 1 registro:\n\nnome: melhor pai do mundo\nstatus: insubstituível\ntags: [herói, exemplo, programador de vida]\n\nFeliz Dia dos Pais! 🖥️❤️",
-  "Deploy em produção realizado com sucesso.\n\nversão: eterna\nautor: você\nmensagem do commit: \"obrigado por tudo, feliz Dia dos Pais!\""
-];
+`Pai, feliz Dia dos Pais! ❤️
 
-function addUserMsg(text){
-  const div = document.createElement('div');
-  div.className = 'msg';
-  div.innerHTML = `
-    <div class="avatar user">🙂</div>
-    <div class="bubble"><div class="who">você</div>${escapeHtml(text)}</div>
-  `;
-  terminal.appendChild(div);
-  scrollDown();
-}
+Queria te agradecer por tudo que você faz por mim e, principalmente, por sempre estar do meu lado e acreditar nos meus sonhos.
+
+A natação é uma parte muito importante da minha vida. São muitos treinos, competições, viagens, dias bons e também dias em que as coisas não saem como eu queria. E ter você me apoiando em tudo isso faz muita diferença para mim.
+
+Cada vez que eu entro na piscina querendo melhorar meus tempos, bater minhas metas, competir em Paulista, Brasileiro e continuar buscando chegar cada vez mais perto do alto rendimento, eu sei que não estou fazendo isso sozinho. Você faz parte de cada conquista minha.
+
+Obrigado por acreditar em mim até quando eu mesmo fico preocupado se vou conseguir. Obrigado por comemorar minhas conquistas, por me incentivar a continuar treinando e por querer sempre o melhor para mim.
+
+Eu ainda tenho muitos sonhos na natação e na vida, e espero poder conquistar muitos deles com você acompanhando tudo de perto.
+
+Tenho muito orgulho de ser seu filho e sou muito grato por ter você como meu pai.
+
+Te amo muito, pai. ❤️
+
+Feliz Dia dos Pais 🏊‍♂️💙`
+];
 
 function escapeHtml(str){
   const d = document.createElement('div');
@@ -262,36 +364,39 @@ function escapeHtml(str){
   return d.innerHTML;
 }
 
-function addToolCard(){
+function scrollDown(){
+  chat.scrollTo({top: chat.scrollHeight, behavior:'smooth'});
+}
+
+function addUserMsg(text){
+  const row = document.createElement('div');
+  row.className = 'msg-user-row';
+  row.innerHTML = `<div class="msg-user">${escapeHtml(text)}</div>`;
+  chatInner.appendChild(row);
+  scrollDown();
+}
+
+function addToolBlock(){
   const div = document.createElement('div');
-  div.className = 'msg';
+  div.className = 'msg-assistant';
   div.innerHTML = `
-    <div class="avatar bot">💻</div>
-    <div class="bubble">
-      <div class="who">agente-fap</div>
-      <div class="tool-card" id="toolCard">
+    <div class="tool-block" id="toolBlock">
+      <div class="tool-head">
         <div class="spinner"></div>
-        <span id="toolLabel">executando...</span>
+        <span id="toolLabel">Executando...</span>
       </div>
     </div>
   `;
-  terminal.appendChild(div);
+  chatInner.appendChild(div);
   scrollDown();
   return div;
 }
 
-function scrollDown(){
-  window.scrollTo({top: document.body.scrollHeight, behavior:'smooth'});
-}
-
 function addBotResponse(text){
   const div = document.createElement('div');
-  div.className = 'msg';
-  div.innerHTML = `
-    <div class="avatar bot">💻</div>
-    <div class="bubble"><div class="who">agente-fap</div><span class="botText"></span><span class="cursor"></span></div>
-  `;
-  terminal.appendChild(div);
+  div.className = 'msg-assistant';
+  div.innerHTML = `<p><span class="botText"></span><span class="cursor"></span></p>`;
+  chatInner.appendChild(div);
   scrollDown();
   const el = div.querySelector('.botText');
   const cursor = div.querySelector('.cursor');
@@ -301,7 +406,7 @@ function addBotResponse(text){
       el.textContent = text.slice(0, i);
       i++;
       scrollDown();
-      setTimeout(type, 16);
+      setTimeout(type, 15);
     } else {
       cursor.remove();
     }
@@ -313,13 +418,14 @@ function handleSend(){
   if(!text) return;
   addUserMsg(text);
   input.value = '';
+  input.style.height = 'auto';
   sendBtn.disabled = true;
   input.disabled = true;
 
-  const cardWrap = addToolCard();
-  const card = cardWrap.querySelector('#toolCard');
-  const label = cardWrap.querySelector('#toolLabel');
-  const steps = ["executando...", "buscando memórias de infância...", "gerando resposta com carinho..."];
+  const blockWrap = addToolBlock();
+  const block = blockWrap.querySelector('#toolBlock');
+  const label = blockWrap.querySelector('#toolLabel');
+  const steps = ["Executando...", "Buscando memórias de infância...", "Gerando resposta com carinho..."];
   let s = 0;
   const stepInterval = setInterval(() => {
     s++;
@@ -330,8 +436,8 @@ function handleSend(){
 
   setTimeout(() => {
     clearInterval(stepInterval);
-    card.classList.add('done');
-    label.textContent = "concluído";
+    block.classList.add('done');
+    label.textContent = "Concluído";
     const response = responses[Math.floor(Math.random() * responses.length)];
     setTimeout(() => {
       addBotResponse(response);
@@ -344,7 +450,14 @@ function handleSend(){
 
 sendBtn.addEventListener('click', handleSend);
 input.addEventListener('keydown', (e) => {
-  if(e.key === 'Enter') handleSend();
+  if(e.key === 'Enter' && !e.shiftKey){
+    e.preventDefault();
+    handleSend();
+  }
+});
+input.addEventListener('input', () => {
+  input.style.height = 'auto';
+  input.style.height = Math.min(input.scrollHeight, 120) + 'px';
 });
 </script>
 </body>
