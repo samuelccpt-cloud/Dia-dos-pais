@@ -267,9 +267,39 @@
   @media (max-width:720px){
     .sidebar{display:none;}
   }
+
+  #confettiCanvas{
+    position:fixed;
+    top:0;left:0;
+    width:100vw;height:100vh;
+    pointer-events:none;
+    z-index:9999;
+    display:none;
+  }
+
+  .inspo-badge{
+    align-self:center;
+    margin:6px auto 0;
+    background:linear-gradient(135deg,#2a1f3a,#1f2a3a);
+    border:1px solid var(--border);
+    color:#fff;
+    padding:10px 22px;
+    border-radius:999px;
+    font-size:15px;
+    font-weight:600;
+    text-align:center;
+    opacity:0;
+    transform:translateY(8px) scale(.95);
+    transition:opacity .5s ease, transform .5s ease;
+  }
+  .inspo-badge.show{
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
 </style>
 </head>
 <body>
+<canvas id="confettiCanvas"></canvas>
 <div class="app">
 
   <div class="sidebar">
@@ -409,8 +439,69 @@ function addBotResponse(text){
       setTimeout(type, 15);
     } else {
       cursor.remove();
+      onMessageFinished(div);
     }
   })();
+}
+
+function onMessageFinished(afterEl){
+  launchConfetti();
+  const badge = document.createElement('div');
+  badge.className = 'inspo-badge';
+  badge.innerHTML = `💙 minha inspiração de vida 💙`;
+  chatInner.appendChild(badge);
+  scrollDown();
+  requestAnimationFrame(() => badge.classList.add('show'));
+}
+
+function launchConfetti(){
+  const canvas = document.getElementById('confettiCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  canvas.style.display = 'block';
+
+  const colors = ['#d97757','#4f9eff','#3fb950','#e8b878','#ff6b9d','#ffd166'];
+  const pieces = [];
+  const count = 160;
+  for(let i=0;i<count;i++){
+    pieces.push({
+      x: Math.random()*canvas.width,
+      y: -20 - Math.random()*canvas.height*0.5,
+      w: 6+Math.random()*6,
+      h: 8+Math.random()*8,
+      color: colors[Math.floor(Math.random()*colors.length)],
+      speedY: 2+Math.random()*3,
+      speedX: -1.5+Math.random()*3,
+      rot: Math.random()*360,
+      rotSpeed: -6+Math.random()*12
+    });
+  }
+
+  let frame = 0;
+  const maxFrames = 260;
+  function draw(){
+    frame++;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    pieces.forEach(p => {
+      p.x += p.speedX;
+      p.y += p.speedY;
+      p.rot += p.rotSpeed;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot*Math.PI/180);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+      ctx.restore();
+    });
+    if(frame < maxFrames){
+      requestAnimationFrame(draw);
+    } else {
+      canvas.style.display = 'none';
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+    }
+  }
+  draw();
 }
 
 function handleSend(){
