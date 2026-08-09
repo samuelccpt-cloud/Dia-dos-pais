@@ -296,6 +296,27 @@
     opacity:1;
     transform:translateY(0) scale(1);
   }
+
+  .share-row{
+    display:flex;
+    justify-content:center;
+    margin-top:10px;
+  }
+  .share-btn{
+    background:transparent;
+    border:1px solid var(--border);
+    color:var(--muted);
+    padding:8px 16px;
+    border-radius:999px;
+    font-size:13px;
+    cursor:pointer;
+    transition:background .2s ease, color .2s ease, border-color .2s ease;
+  }
+  .share-btn:hover{
+    background:#20232a;
+    color:var(--text);
+    border-color:#3a3d44;
+  }
 </style>
 </head>
 <body>
@@ -333,7 +354,7 @@
 
     <div class="input-area">
       <div class="input-shell">
-        <textarea id="userInput" rows="1" placeholder="Escreva algo pra hoje... (ex: dia dos pais)"></textarea>
+        <textarea id="userInput" rows="1" placeholder="Escreve algo pro Henrique aqui..."></textarea>
         <div class="input-toolbar">
           <div class="model-pill">✨ Automático</div>
           <div class="toolbar-right">
@@ -385,8 +406,37 @@ Espero que a gente ainda tenha muitos sábados de pastel na feira, muitas conver
 
 Eu te amo muito, pai. Obrigado por tudo e por ser quem você é para mim. ❤️
 
-Feliz Dia dos Pais, Henrique! 💙`
+Feliz Dia dos Pais, Henrique! 💙`,
+
+`Sabe o que eu mais guardo comigo? Os sábados de pastel na feira. 🥟
+
+Parece uma coisa simples, mas pra mim virou tradição, virou lembrança boa. É um tempo só nosso, sem pressa, só a gente conversando e comendo pastel quentinho.
+
+Espero que a gente ainda tenha muitos e muitos sábados assim pela frente.
+
+Te amo, pai. 💙`,
+
+`Lembra das competições em que você foi comigo? 🏊‍♂️
+
+Das viagens, das madrugadas acordando cedo, de você na arquibancada torcendo, nervoso, mesmo tentando disfarçar. Cada prova que eu nado, uma parte dessa conquista é sua também.
+
+Obrigado por nunca ter me deixado sozinho nessa caminhada. Feliz Dia dos Pais! 🏅💙`,
+
+`Tem um conselho seu que eu carrego comigo até hoje: que eu confie no meu processo, que os resultados vêm com constância e que eu não desista nos dias ruins.
+
+Isso vale pra piscina, mas vale pra vida toda também. Obrigado por me ensinar isso — e por tanta coisa mais que eu nem consigo colocar em palavras.
+
+Feliz Dia dos Pais, pai. Te amo. ❤️`
 ];
+
+let responseQueue = [];
+function nextResponse(){
+  if(responseQueue.length === 0){
+    responseQueue = responses.map((_, i) => i).sort(() => Math.random() - 0.5);
+  }
+  const idx = responseQueue.shift();
+  return responses[idx];
+}
 
 function escapeHtml(str){
   const d = document.createElement('div');
@@ -446,12 +496,59 @@ function addBotResponse(text){
 
 function onMessageFinished(afterEl){
   launchConfetti();
+  playBellSound();
+
   const badge = document.createElement('div');
   badge.className = 'inspo-badge';
   badge.innerHTML = `💙 minha inspiração de vida 💙`;
   chatInner.appendChild(badge);
+
+  const shareRow = document.createElement('div');
+  shareRow.className = 'share-row';
+  shareRow.innerHTML = `<button class="share-btn" id="shareBtn">🔗 Compartilhar esta página</button>`;
+  chatInner.appendChild(shareRow);
+
   scrollDown();
   requestAnimationFrame(() => badge.classList.add('show'));
+
+  const shareBtn = shareRow.querySelector('#shareBtn');
+  shareBtn.addEventListener('click', async () => {
+    const url = window.location.href;
+    try{
+      if(navigator.share){
+        await navigator.share({ title: 'Feliz Dia dos Pais', url });
+      } else {
+        await navigator.clipboard.writeText(url);
+        shareBtn.textContent = '✓ Link copiado!';
+        setTimeout(() => { shareBtn.textContent = '🔗 Compartilhar esta página'; }, 2200);
+      }
+    } catch(err){
+      shareBtn.textContent = '🔗 Compartilhar esta página';
+    }
+  });
+}
+
+let audioCtx = null;
+function playBellSound(){
+  try{
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    const now = audioCtx.currentTime;
+    const notes = [1046.5, 1318.5, 1568.0];
+    notes.forEach((freq, i) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      const start = now + i * 0.12;
+      gain.gain.setValueAtTime(0, start);
+      gain.gain.linearRampToValueAtTime(0.18, start + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, start + 0.9);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(start);
+      osc.stop(start + 1);
+    });
+  } catch(err){}
 }
 
 function launchConfetti(){
@@ -529,7 +626,7 @@ function handleSend(){
     clearInterval(stepInterval);
     block.classList.add('done');
     label.textContent = "Concluído";
-    const response = responses[Math.floor(Math.random() * responses.length)];
+    const response = nextResponse();
     setTimeout(() => {
       addBotResponse(response);
       sendBtn.disabled = false;
