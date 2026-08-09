@@ -317,6 +317,64 @@
     color:var(--text);
     border-color:#3a3d44;
   }
+
+  #codeView{
+    flex:1;
+    overflow-y:auto;
+  }
+  .code-view-inner{
+    max-width:780px;
+    margin:0 auto;
+    padding:28px 24px;
+  }
+  .code-desc{
+    color:var(--muted);
+    font-size:14px;
+    line-height:1.6;
+    margin:0 0 16px;
+  }
+  .code-desc code{
+    background:#20232a;
+    padding:1px 6px;
+    border-radius:4px;
+    font-size:13px;
+  }
+  .code-box{
+    border:1px solid var(--border);
+    border-radius:10px;
+    overflow:hidden;
+    background:#0c0d10;
+  }
+  .code-box-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:9px 14px;
+    background:#161820;
+    border-bottom:1px solid var(--border);
+    font-size:12.5px;
+    color:var(--muted);
+  }
+  .copy-btn{
+    background:var(--accent);
+    color:#1a1a1a;
+    border:none;
+    padding:5px 12px;
+    border-radius:6px;
+    font-size:12px;
+    font-weight:600;
+    cursor:pointer;
+  }
+  .code-box pre{
+    margin:0;
+    padding:16px;
+    max-height:60vh;
+    overflow:auto;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:12px;
+    line-height:1.55;
+    color:#c9cacd;
+  }
 </style>
 </head>
 <body>
@@ -324,8 +382,8 @@
 <div class="app">
 
   <div class="sidebar">
-    <div class="row active"><span class="icon">🏠</span> Início</div>
-    <div class="row"><span class="icon">💬</span> Code</div>
+    <div class="row active" id="rowInicio"><span class="icon">🏠</span> Início</div>
+    <div class="row" id="rowCode"><span class="icon">💬</span> Code</div>
     <div class="section-title">cronometro-natacao</div>
     <div class="thread selected"><span class="dot-status"></span> Feliz Dia dos Pais</div>
     <div class="thread"><span class="dot-status" style="background:#5c5f66"></span> Cronômetro natação</div>
@@ -344,26 +402,41 @@
       <span class="path-badge">para-o-melhor-pai</span>
     </div>
 
-    <div class="chat" id="chat">
-      <div class="chat-inner" id="chatInner">
-        <div class="msg-assistant">
-          <p><span id="intro"></span><span class="cursor" id="introCursor"></span></p>
-        </div>
-      </div>
-    </div>
-
-    <div class="input-area">
-      <div class="input-shell">
-        <textarea id="userInput" rows="1" placeholder="Escreve algo pro Henrique aqui..."></textarea>
-        <div class="input-toolbar">
-          <div class="model-pill">✨ Automático</div>
-          <div class="toolbar-right">
-            <span>Sonnet 5</span>
-            <button class="send-btn" id="sendBtn">➤</button>
+    <div id="chatView">
+      <div class="chat" id="chat">
+        <div class="chat-inner" id="chatInner">
+          <div class="msg-assistant">
+            <p><span id="intro"></span><span class="cursor" id="introCursor"></span></p>
           </div>
         </div>
       </div>
-      <div class="hint">feito com <span class="heart">♥</span> por um filho que também é dev</div>
+
+      <div class="input-area">
+        <div class="input-shell">
+          <textarea id="userInput" rows="1" placeholder="Escreve algo pro Henrique aqui..."></textarea>
+          <div class="input-toolbar">
+            <div class="model-pill">✨ Automático</div>
+            <div class="toolbar-right">
+              <span>Sonnet 5</span>
+              <button class="send-btn" id="sendBtn">➤</button>
+            </div>
+          </div>
+        </div>
+        <div class="hint">feito com <span class="heart">♥</span> por um filho que também é dev</div>
+      </div>
+    </div>
+
+    <div id="codeView" style="display:none;">
+      <div class="code-view-inner">
+        <p class="code-desc">Copia esse código e cola em qualquer arquivo <code>.html</code> (ou site) — ao abrir, a mesma mensagem aparece lá, sozinha.</p>
+        <div class="code-box">
+          <div class="code-box-head">
+            <span>mensagem.html</span>
+            <button class="copy-btn" id="copyCodeBtn">📋 Copiar código</button>
+          </div>
+          <pre><code id="codeOutput"></code></pre>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -635,6 +708,100 @@ function handleSend(){
     }, 300);
   }, 1900);
 }
+
+const PORTABLE_HTML = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feliz Dia dos Pais</title>
+<style>
+  body{
+    margin:0;
+    min-height:100vh;
+    background:#0f1115;
+    color:#e8e8e6;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:32px;
+    box-sizing:border-box;
+  }
+  .card{
+    max-width:560px;
+    background:#181a20;
+    border:1px solid #2a2d34;
+    border-radius:16px;
+    padding:32px;
+    line-height:1.65;
+    font-size:15.5px;
+    white-space:pre-wrap;
+  }
+  .badge{
+    display:inline-block;
+    margin-top:18px;
+    background:linear-gradient(135deg,#2a1f3a,#1f2a3a);
+    border:1px solid #2a2d34;
+    color:#fff;
+    padding:8px 18px;
+    border-radius:999px;
+    font-size:14px;
+    font-weight:600;
+  }
+</style>
+</head>
+<body>
+  <div class="card">${responses[0]}<br><br><span class="badge">💙 minha inspiração de vida 💙</span></div>
+</body>
+</html>`;
+
+document.getElementById('codeOutput').textContent = PORTABLE_HTML;
+
+const rowInicio = document.getElementById('rowInicio');
+const rowCode = document.getElementById('rowCode');
+const chatView = document.getElementById('chatView');
+const codeView = document.getElementById('codeView');
+
+rowInicio.addEventListener('click', () => {
+  rowInicio.classList.add('active');
+  rowCode.classList.remove('active');
+  chatView.style.display = '';
+  codeView.style.display = 'none';
+});
+rowCode.addEventListener('click', () => {
+  rowCode.classList.add('active');
+  rowInicio.classList.remove('active');
+  chatView.style.display = 'none';
+  codeView.style.display = '';
+});
+
+function fallbackCopy(text){
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  let ok = false;
+  try{ ok = document.execCommand('copy'); } catch(err){ ok = false; }
+  document.body.removeChild(ta);
+  return ok;
+}
+
+document.getElementById('copyCodeBtn').addEventListener('click', async (e) => {
+  const btn = e.currentTarget;
+  let ok = false;
+  try{
+    await navigator.clipboard.writeText(PORTABLE_HTML);
+    ok = true;
+  } catch(err){
+    ok = fallbackCopy(PORTABLE_HTML);
+  }
+  btn.textContent = ok ? '✓ Copiado!' : 'Selecione e copie manualmente';
+  setTimeout(() => { btn.textContent = '📋 Copiar código'; }, 2200);
+});
 
 sendBtn.addEventListener('click', handleSend);
 input.addEventListener('keydown', (e) => {
