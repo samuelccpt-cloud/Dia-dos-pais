@@ -331,7 +331,7 @@
     color:var(--muted);
     font-size:14px;
     line-height:1.6;
-    margin:0 0 16px;
+    margin:16px 0;
   }
   .code-desc code{
     background:#20232a;
@@ -339,41 +339,85 @@
     border-radius:4px;
     font-size:13px;
   }
-  .code-box{
+
+  .write-call{
     border:1px solid var(--border);
     border-radius:10px;
     overflow:hidden;
-    background:#0c0d10;
+    background:#14161a;
+    animation:fadeIn .35s ease;
   }
-  .code-box-head{
+  .write-head{
     display:flex;
     align-items:center;
-    justify-content:space-between;
-    padding:9px 14px;
-    background:#161820;
+    gap:8px;
+    padding:10px 14px;
+    background:#181b21;
     border-bottom:1px solid var(--border);
-    font-size:12.5px;
-    color:var(--muted);
+    font-size:13px;
   }
+  .write-icon{
+    color:var(--accent2);
+    font-size:13px;
+  }
+  .write-title{
+    color:var(--text);
+    font-weight:600;
+  }
+  .write-file{
+    color:var(--muted);
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:12.5px;
+  }
+  .write-stat{
+    margin-left:auto;
+    color:var(--green);
+    font-size:12px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  .diff-box{
+    max-height:55vh;
+    overflow:auto;
+    background:#0c0d10;
+  }
+  .diff-box pre{
+    margin:0;
+    padding:4px 0;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:12px;
+    line-height:1.6;
+  }
+  .diff-line{
+    display:flex;
+    white-space:pre;
+  }
+  .diff-line .gutter{
+    flex:0 0 42px;
+    text-align:right;
+    padding-right:10px;
+    color:#4a4d55;
+    user-select:none;
+  }
+  .diff-line .plus{
+    flex:0 0 18px;
+    color:var(--green);
+  }
+  .diff-line .code-text{
+    color:#b8e6b0;
+  }
+  .diff-line.bg-add{
+    background:rgba(63,185,80,0.08);
+  }
+
   .copy-btn{
     background:var(--accent);
     color:#1a1a1a;
     border:none;
-    padding:5px 12px;
-    border-radius:6px;
-    font-size:12px;
+    padding:7px 16px;
+    border-radius:7px;
+    font-size:13px;
     font-weight:600;
     cursor:pointer;
-  }
-  .code-box pre{
-    margin:0;
-    padding:16px;
-    max-height:60vh;
-    overflow:auto;
-    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-    font-size:12px;
-    line-height:1.55;
-    color:#c9cacd;
   }
 </style>
 </head>
@@ -428,14 +472,19 @@
 
     <div id="codeView" style="display:none;">
       <div class="code-view-inner">
-        <p class="code-desc">Copia esse código e cola em qualquer arquivo <code>.html</code> (ou site) — ao abrir, a mesma mensagem aparece lá, sozinha.</p>
-        <div class="code-box">
-          <div class="code-box-head">
-            <span>mensagem.html</span>
-            <button class="copy-btn" id="copyCodeBtn">📋 Copiar código</button>
+        <div class="write-call" id="writeCall">
+          <div class="write-head">
+            <span class="write-icon">✎</span>
+            <span class="write-title">Write</span>
+            <span class="write-file">mensagem.html</span>
+            <span class="write-stat" id="writeStat"></span>
           </div>
-          <pre><code id="codeOutput"></code></pre>
+          <div class="diff-box">
+            <pre id="diffOutput"></pre>
+          </div>
         </div>
+        <p class="code-desc">Copia esse código e cola em qualquer arquivo <code>.html</code> (ou site) — ao abrir, a mesma mensagem aparece lá, sozinha.</p>
+        <button class="copy-btn" id="copyCodeBtn">📋 Copiar código</button>
       </div>
     </div>
   </div>
@@ -756,12 +805,45 @@ const PORTABLE_HTML = `<!DOCTYPE html>
 </body>
 </html>`;
 
-document.getElementById('codeOutput').textContent = PORTABLE_HTML;
-
 const rowInicio = document.getElementById('rowInicio');
 const rowCode = document.getElementById('rowCode');
 const chatView = document.getElementById('chatView');
 const codeView = document.getElementById('codeView');
+const diffOutput = document.getElementById('diffOutput');
+const writeStat = document.getElementById('writeStat');
+
+function escapeHtml2(str){
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+let diffPlayed = false;
+function playDiffWrite(){
+  if(diffPlayed) return;
+  diffPlayed = true;
+
+  const lines = PORTABLE_HTML.split('\n');
+  diffOutput.innerHTML = '';
+  writeStat.textContent = '';
+
+  let i = 0;
+  function addLine(){
+    if(i >= lines.length){
+      writeStat.textContent = `+${lines.length}`;
+      return;
+    }
+    const row = document.createElement('div');
+    row.className = 'diff-line bg-add';
+    row.innerHTML = `<span class="gutter">${i + 1}</span><span class="plus">+</span><span class="code-text">${escapeHtml2(lines[i])}</span>`;
+    diffOutput.appendChild(row);
+    i++;
+    writeStat.textContent = `+${i}`;
+    diffOutput.parentElement.scrollTop = diffOutput.parentElement.scrollHeight;
+    setTimeout(addLine, 12);
+  }
+  addLine();
+}
 
 rowInicio.addEventListener('click', () => {
   rowInicio.classList.add('active');
@@ -774,6 +856,7 @@ rowCode.addEventListener('click', () => {
   rowInicio.classList.remove('active');
   chatView.style.display = 'none';
   codeView.style.display = '';
+  playDiffWrite();
 });
 
 function fallbackCopy(text){
