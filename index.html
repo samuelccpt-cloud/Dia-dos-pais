@@ -327,7 +327,7 @@
     margin:0 auto;
     padding:28px 24px;
   }
-  .code-desc{
+  .code-desc, .code-intro{
     color:var(--muted);
     font-size:14px;
     line-height:1.6;
@@ -472,7 +472,9 @@
 
     <div id="codeView" style="display:none;">
       <div class="code-view-inner">
-        <div class="write-call" id="writeCall">
+        <p class="code-intro" id="codeIntro">Escreve algo aí embaixo pra eu gerar o arquivo com a mensagem.</p>
+
+        <div class="write-call" id="writeCall" style="display:none;">
           <div class="write-head">
             <span class="write-icon">✎</span>
             <span class="write-title">Write</span>
@@ -483,8 +485,22 @@
             <pre id="diffOutput"></pre>
           </div>
         </div>
-        <p class="code-desc">Copia esse código e cola em qualquer arquivo <code>.html</code> (ou site) — ao abrir, a mesma mensagem aparece lá, sozinha.</p>
-        <button class="copy-btn" id="copyCodeBtn">📋 Copiar código</button>
+        <p class="code-desc" id="codeDesc" style="display:none;">Copia esse código e cola em qualquer arquivo <code>.html</code> (ou site) — ao abrir, a mesma mensagem aparece lá, sozinha.</p>
+        <button class="copy-btn" id="copyCodeBtn" style="display:none;">📋 Copiar código</button>
+      </div>
+
+      <div class="input-area">
+        <div class="input-shell">
+          <textarea id="codeInput" rows="1" placeholder="Escreve algo pro Henrique aqui..."></textarea>
+          <div class="input-toolbar">
+            <div class="model-pill">✨ Automático</div>
+            <div class="toolbar-right">
+              <span>Sonnet 5</span>
+              <button class="send-btn" id="codeSendBtn">➤</button>
+            </div>
+          </div>
+        </div>
+        <div class="hint">feito com <span class="heart">♥</span> por um filho que também é dev</div>
       </div>
     </div>
   </div>
@@ -811,6 +827,12 @@ const chatView = document.getElementById('chatView');
 const codeView = document.getElementById('codeView');
 const diffOutput = document.getElementById('diffOutput');
 const writeStat = document.getElementById('writeStat');
+const writeCall = document.getElementById('writeCall');
+const codeIntro = document.getElementById('codeIntro');
+const codeDesc = document.getElementById('codeDesc');
+const copyCodeBtn = document.getElementById('copyCodeBtn');
+const codeInput = document.getElementById('codeInput');
+const codeSendBtn = document.getElementById('codeSendBtn');
 
 function escapeHtml2(str){
   const d = document.createElement('div');
@@ -823,6 +845,9 @@ function playDiffWrite(){
   if(diffPlayed) return;
   diffPlayed = true;
 
+  codeIntro.style.display = 'none';
+  writeCall.style.display = '';
+
   const lines = PORTABLE_HTML.split('\n');
   diffOutput.innerHTML = '';
   writeStat.textContent = '';
@@ -831,6 +856,10 @@ function playDiffWrite(){
   function addLine(){
     if(i >= lines.length){
       writeStat.textContent = `+${lines.length}`;
+      codeDesc.style.display = '';
+      copyCodeBtn.style.display = '';
+      codeSendBtn.disabled = false;
+      codeInput.disabled = false;
       return;
     }
     const row = document.createElement('div');
@@ -845,6 +874,28 @@ function playDiffWrite(){
   addLine();
 }
 
+function handleCodeSend(){
+  const text = codeInput.value.trim();
+  if(!text || diffPlayed) return;
+  codeInput.value = '';
+  codeInput.style.height = 'auto';
+  codeSendBtn.disabled = true;
+  codeInput.disabled = true;
+  playDiffWrite();
+}
+
+codeSendBtn.addEventListener('click', handleCodeSend);
+codeInput.addEventListener('keydown', (e) => {
+  if(e.key === 'Enter' && !e.shiftKey){
+    e.preventDefault();
+    handleCodeSend();
+  }
+});
+codeInput.addEventListener('input', () => {
+  codeInput.style.height = 'auto';
+  codeInput.style.height = Math.min(codeInput.scrollHeight, 120) + 'px';
+});
+
 rowInicio.addEventListener('click', () => {
   rowInicio.classList.add('active');
   rowCode.classList.remove('active');
@@ -856,7 +907,6 @@ rowCode.addEventListener('click', () => {
   rowInicio.classList.remove('active');
   chatView.style.display = 'none';
   codeView.style.display = '';
-  playDiffWrite();
 });
 
 function fallbackCopy(text){
@@ -873,7 +923,7 @@ function fallbackCopy(text){
   return ok;
 }
 
-document.getElementById('copyCodeBtn').addEventListener('click', async (e) => {
+copyCodeBtn.addEventListener('click', async (e) => {
   const btn = e.currentTarget;
   let ok = false;
   try{
